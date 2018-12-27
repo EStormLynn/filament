@@ -27,7 +27,7 @@ badges above.
   real-time physically based rendering, the graphics capabilities and implementation of Filament.
   This document explains the math and reasoning behind most of our decisions. This document is a
   good introduction to PBR for graphics programmers.
-- [Materials](https://google.github.io/filament//Materials.md.html), the full reference
+- [Materials](https://google.github.io/filament/Materials.md.html), the full reference
   documentation for our material system. This document explains our different material models, how
   to use the material compiler `matc` and how to write custom materials.
 - [Material Properties](https://google.github.io/filament/Material%20Properties.pdf), a reference
@@ -37,22 +37,21 @@ badges above.
 
 Here are a few sample materials rendered with Filament:
 
-![Brushed copper](docs/images/samples/brushed_copper_2.png)
-![Chess set](docs/images/samples/chess1.png)
-![Environment lighting](docs/images/samples/spheres.png)
-![Material 1](docs/images/samples/material_01.png)
-![Material 2](docs/images/samples/material_02.png)
-![Material 3](docs/images/samples/material_03.png)
-![Material 4](docs/images/samples/material_04.png)
-![Material 6](docs/images/samples/material_06.png)
-![Material 7](docs/images/samples/material_07.png)
-![Material 8](docs/images/samples/material_08.png)
+![Damaged Helmet](docs/images/samples/model_damaged_helmet.jpg)
+![Helmet](docs/images/samples/model_helmet.jpg)
+![Brushed copper](docs/images/samples/brushed_copper_2.jpg)
+![Chess set](docs/images/samples/chess1.jpg)
+![Material 1](docs/images/samples/material_01.jpg)
+![Material 2](docs/images/samples/material_02.jpg)
+![Material 3](docs/images/samples/material_03.jpg)
+![Material 6](docs/images/samples/material_06.jpg)
+![Material 8](docs/images/samples/material_08.jpg)
 
 ## Features
 
 ### APIs
 
-- Native C++ API for Android, Linux, macOS and Windows
+- Native C++ API for Android, iOS, Linux, macOS and Windows
 - Java/JNI API for Android, Linux, macOS and Windows
 - JavaScript API
 
@@ -98,47 +97,51 @@ Many other features have been either prototyped or planned:
 
 ## Directory structure
 
-- `filament`:                Filament engine and its supporting libraries and tools
-  - `android`:               Android libraries and projects
-    - `build`:               Custom Gradle tasks for Android builds
-    - `filament-android`:    Filament library (AAR) for Android
-    - `samples`:             Android-specific Filament samples
-  - `art`:                   Source for various artworks (logos, PDF manuals, etc.)
-  - `assets`:                3D assets to use with sample applications
-  - `build`:                 CMake build scripts
-  - `docs`:                  Documentation
-    - `math`:                Mathematica notebooks used to explore BRDFs, equations, etc.
-  - `filament`:              Filament engine
-  - `ide`:                   Configuration files for IDEs (CLion, etc.)
-  - `ios`:                   Sample projects for iOS
-  - `java`:                  Java bindings for Filament libraries
-  - `libs`:                  Libraries
-    - `bluegl`:                OpenGL bindings for macOS, Linux and Windows
-    - `bluevk`:                Vulkan bindings for macOS, Linux, Windows and Android
-    - `filabridge`:            Library shared by the Filament engine and host tools
-    - `filaflat`:              Serialization/deserialization library used for materials
-    - `filagui`:               Helper library for [Dear ImGui](https://github.com/ocornut/imgui)
-    - `filamat`:               Material generation library
-    - `filameshio`:            Tiny mesh parsing library (see also `tools/filamesh`)
-    - `image`:                 Image filtering and simple transforms
-    - `imageio`:               Image file reading / writing, only intended for internal use
-    - `math`:                  Math library
-    - `utils`:                 Utility library (threads, memory, data structures, etc.)
-  - `samples`:               Sample desktop applications
-  - `shaders`:               Shaders used by `filamat` and `matc`
-  - `third_party`:           External libraries and assets
-    - `environments`:        Environment maps under CC0 license that can be used with `cmgen`
-    - `textures`:            Textures under CC0 license
-  - `tools`:                 Host tools
-    - `cmgen`:               Image-based lighting asset generator
-    - `filamesh`:            Mesh converter
-    - `matc`:                Material compiler
-    - `matinfo`              Displays information about materials compiled with `matc`
-    - `mipgen`               Generates a series of miplevels from a source image.
-    - `normal-blending`:     Tool to blend normal maps
-    - `roughness-prefilter`: Pre-filters a roughness map from a normal map to reduce aliasing
-    - `skygen`:              Physically-based sky environment texture generator
-    - `specular-color`:      Computes the specular color of conductors based on spectral data
+This repository not only contains the core Filament engine, but also its supporting libraries
+and tools.
+
+- `android`:               Android libraries and projects
+  - `build`:               Custom Gradle tasks for Android builds
+  - `filament-android`:    Filament library (AAR) for Android
+  - `samples`:             Android-specific Filament samples
+- `art`:                   Source for various artworks (logos, PDF manuals, etc.)
+- `assets`:                3D assets to use with sample applications
+- `build`:                 CMake build scripts
+- `docs`:                  Documentation
+  - `math`:                Mathematica notebooks used to explore BRDFs, equations, etc.
+- `filament`:              Filament rendering engine (minimal dependencies)
+- `ide`:                   Configuration files for IDEs (CLion, etc.)
+- `ios`:                   Sample projects for iOS
+- `java`:                  Java bindings for Filament libraries
+- `libs`:                  Libraries
+  - `bluegl`:              OpenGL bindings for macOS, Linux and Windows
+  - `bluevk`:              Vulkan bindings for macOS, Linux, Windows and Android
+  - `filabridge`:          Library shared by the Filament engine and host tools
+  - `filaflat`:            Serialization/deserialization library used for materials
+  - `filagui`:             Helper library for [Dear ImGui](https://github.com/ocornut/imgui)
+  - `filamat`:             Material generation library
+  - `filameshio`:          Tiny mesh parsing library (see also `tools/filamesh`)
+  - `image`:               Image filtering and simple transforms
+  - `imageio`:             Image file reading / writing, only intended for internal use
+  - `math`:                Math library
+  - `utils`:               Utility library (threads, memory, data structures, etc.)
+- `samples`:               Sample desktop applications
+- `shaders`:               Shaders used by `filamat` and `matc`
+- `third_party`:           External libraries and assets
+  - `environments`:        Environment maps under CC0 license that can be used with `cmgen`
+  - `textures`:            Textures under CC0 license
+- `tools`:                 Host tools
+  - `cmgen`:               Image-based lighting asset generator
+  - `filamesh`:            Mesh converter
+  - `matc`:                Material compiler
+  - `matinfo`              Displays information about materials compiled with `matc`
+  - `mipgen`               Generates a series of miplevels from a source image
+  - `normal-blending`:     Tool to blend normal maps
+  - `resgen`               Aggregates binary blobs into embeddable resources
+  - `roughness-prefilter`: Pre-filters a roughness map from a normal map to reduce aliasing
+  - `skygen`:              Physically-based sky environment texture generator
+  - `specular-color`:      Computes the specular color of conductors based on spectral data
+- `web`:                   JavaScript bindings, documentation, and samples
 
 ## Building Filament
 
@@ -324,14 +327,21 @@ Google employees require additional steps which can be found here [go/filawin](h
 Install the following components:
 
 - [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk)
-- [Visual Studio 2015](https://www.visualstudio.com/downloads)
+- [Visual Studio 2015 or 2017](https://www.visualstudio.com/downloads)
 - [Clang 6](http://releases.llvm.org/download.html)
 - [Python 3.7](https://www.python.org/ftp/python/3.7.0/python-3.7.0.exe)
 - [Git 2.16.1 or later](https://github.com/git-for-windows/git/releases/download/v2.16.1.windows.4/PortableGit-2.16.1.4-64-bit.7z.exe)
 - [Cmake 3.11 or later](https://cmake.org/files/v3.11/cmake-3.11.0-rc1-win64-x64.msi)
 
-Open an VS2015 x64 Native Tools terminal (click the start button, type "x64 native tools" and
-select: "VS2015 x64 Native Tools Command Prompt").
+If you're using Visual Studio 2017, you'll also need to install the [LLVM Compiler
+Toolchain](https://marketplace.visualstudio.com/items?itemName=LLVMExtensions.llvm-toolchain)
+extension.
+
+Open an appropriate Native Tools terminal for the version of Visual Studio you are using:
+- VS 2015: VS2015 x64 Native Tools Command Prompt
+- VS 2017: x64 Native Tools Command Prompt for VS 2017
+
+You can find these by clicking the start button and typing "x64 native tools".
 
 Create a working directory:
 ```
@@ -341,11 +351,20 @@ Create a working directory:
 
 Create the msBuild project:
 ```
+# Visual Studio 2015:
 > cmake -T"LLVM-vs2014" -G "Visual Studio 14 2015 Win64" ../..
+
+# Visual Studio 2017
+> cmake ..\.. -T"LLVM" -G "Visual Studio 15 2017 Win64" ^
+-DCMAKE_CXX_COMPILER:PATH="C:\Program Files\LLVM\bin\clang-cl.exe" ^
+-DCMAKE_C_COMPILER:PATH="C:\Program Files\LLVM\bin\clang-cl.exe" ^
+-DCMAKE_LINKER:PATH="C:\Program Files\LLVM\bin\lld-link.exe"
 ```
 
 Check out the output and make sure Clang for Windows frontend was found. You should see a line
-showing the following ouput.
+showing the following output. Note that for Visual Studio 2017 this line may list Microsoft's
+compiler, but the build will still in fact use Clang and you can proceed.
+
 ```
 Clang:C:/Program Files/LLVM/msbuild-bin/cl.exe
 ```
@@ -376,11 +395,11 @@ Alternatively, you can use [Ninja](https://ninja-build.org/) to build for Window
 installation is still necessary.
 
 First, install the dependencies listed under [Windows](#Windows) as well as Ninja. Then open up a
-VS2015 x64 Native Tools terminal as before. Create a build directory inside Filament and run the
+Native Tools terminal as before. Create a build directory inside Filament and run the
 following CMake command:
 
 ```
-cmake .. -G Ninja ^
+> cmake .. -G Ninja ^
 -DCMAKE_CXX_COMPILER:PATH="C:\Program Files\LLVM\bin\clang-cl.exe" ^
 -DCMAKE_C_COMPILER:PATH="C:\Program Files\LLVM\bin\clang-cl.exe" ^
 -DCMAKE_LINKER:PATH="C:\Program Files\LLVM\bin\lld-link.exe" ^
@@ -405,7 +424,7 @@ ninja
 To confirm Filament was properly built, run the following command from the build directory:
 
 ```
-./samples/material_sandbox --ibl=../../samples/envs/office ../../assets/models/sphere/sphere.obj
+./samples/material_sandbox --ibl=../../samples/envs/pillars ../../assets/models/sphere/sphere.obj
 ```
 
 ### Android
@@ -439,7 +458,7 @@ Run `build.sh -h` for more information.
 ##### Linux toolchain
 
 ```
-$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch arm64 --api 24 \
+$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch arm64 --api 21 \
         --stl libc++ --force \
         --install-dir toolchains/Linux/aarch64-linux-android-4.9
 ```
@@ -447,7 +466,7 @@ $ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch arm64 --api 24
 ##### Darwin toolchain
 
 ```
-$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch arm64 --api 24 \
+$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch arm64 --api 21 \
         --stl libc++ --force \
         --install-dir toolchains/Darwin/aarch64-linux-android-4.9
 ```
@@ -484,7 +503,7 @@ binaries should be found in `out/android-release/filament/lib/arm64-v8a`.
 ##### Linux toolchain
 
 ```
-$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch arm --api 24 \
+$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch arm --api 21 \
         --stl libc++ --force \
         --install-dir toolchains/Linux/arm-linux-androideabi-4.9
 ```
@@ -492,7 +511,7 @@ $ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch arm --api 24 \
 ##### Darwin toolchain
 
 ```
-$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch arm --api 24 \
+$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch arm --api 21 \
         --stl libc++ --force \
         --install-dir toolchains/Darwin/arm-linux-androideabi-4.9
 ```
@@ -529,7 +548,7 @@ binaries should be found in `out/android-release/filament/lib/armeabi-v7a`.
 ##### Linux toolchain
 
 ```
-$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch x86_64 --api 24 \
+$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch x86_64 --api 21 \
         --stl libc++ --force \
         --install-dir toolchains/Linux/x86_64-linux-android-4.9
 ```
@@ -537,7 +556,7 @@ $ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch x86_64 --api 2
 ##### Darwin toolchain
 
 ```
-$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch x86_64 --api 24 \
+$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch x86_64 --api 21 \
         --stl libc++ --force \
         --install-dir toolchains/Darwin/x86_64-linux-android-4.9
 ```
@@ -574,7 +593,7 @@ binaries should be found in `out/android-release/filament/lib/x86_64`.
 ##### Linux toolchain
 
 ```
-$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch x86 --api 24 \
+$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch x86 --api 21 \
         --stl libc++ --force \
         --install-dir toolchains/Linux/i686-linux-android-4.9
 ```
@@ -582,7 +601,7 @@ $ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch x86 --api 24 \
 ##### Darwin toolchain
 
 ```
-$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch x86 --api 24 \
+$ $SDK/ndk-bundle/build/tools/make_standalone_toolchain.py --arch x86 --api 21 \
         --stl libc++ --force \
         --install-dir toolchains/Darwin/i686-linux-android-4.9
 ```
@@ -707,7 +726,7 @@ cd emsdk
 ./emsdk activate sdk-1.38.11-64bit
 ```
 
-After this you can invoke [easy build](#easy-build) script as follows:
+After this you can invoke the [easy build](#easy-build) script as follows:
 
 ```
 export EMSDK=<your chosen home for the emscripten SDK>
@@ -893,6 +912,11 @@ as possible. The current external dependencies of the runtime library include:
 
 - STL
 - robin-map (header only library)
+
+When building with Vulkan enabled, we have a few additional small dependencies:
+
+- vkmemalloc
+- smol-v
 
 Host tools (such as `matc` or `cmgen`) can use external dependencies freely.
 

@@ -12,6 +12,7 @@ set(PUBLIC_HDRS
         include/image/ImageOps.h
         include/image/ImageSampler.h
         include/image/KtxBundle.h
+        include/image/KtxUtility.h
         include/image/LinearImage.h
 )
 
@@ -49,6 +50,12 @@ endif()
 # ==================================================================================================
 add_library(image_headers INTERFACE)
 target_include_directories(image_headers INTERFACE ${PUBLIC_HDR_DIR})
+
+# ==================================================================================================
+# Installation
+# ==================================================================================================
+install(TARGETS ${TARGET} ARCHIVE DESTINATION lib/${DIST_DIR})
+install(DIRECTORY ${PUBLIC_HDR_DIR}/image DESTINATION include)
 
 # ==================================================================================================
 # Tests

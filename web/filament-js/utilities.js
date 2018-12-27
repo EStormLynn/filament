@@ -63,15 +63,17 @@ Filament.PixelBuffer = function(typedarray, format, datatype) {
 /// data by copying a typed array into the WASM heap.
 /// typedarray ::argument:: Data to consume (e.g. Uint8Array, Uint16Array, Float32Array)
 /// cdatatype ::argument:: [CompressedPixelDataType]
+/// faceSize ::argument:: Number of bytes in each face (cubemaps only)
 /// ::retval:: [PixelBufferDescriptor]
-Filament.CompressedPixelBuffer = function(typedarray, cdatatype) {
+Filament.CompressedPixelBuffer = function(typedarray, cdatatype, faceSize) {
     console.assert(typedarray.buffer instanceof ArrayBuffer);
     console.assert(typedarray.byteLength > 0);
+    faceSize = faceSize || typedarray.byteLength;
     if (Filament.HEAPU32.buffer == typedarray.buffer) {
         typedarray = new Uint8Array(typedarray);
     }
     const ta = typedarray;
-    const bd = new Filament.driver$PixelBufferDescriptor(ta, cdatatype, ta.byteLength, true);
+    const bd = new Filament.driver$PixelBufferDescriptor(ta, cdatatype, faceSize, true);
     const uint8array = new Uint8Array(ta.buffer, ta.byteOffset, ta.byteLength);
     bd.getBytes().set(uint8array);
     return bd;
@@ -79,14 +81,14 @@ Filament.CompressedPixelBuffer = function(typedarray, cdatatype) {
 
 Filament._loadFilamesh = function(engine, buffer, definstance, matinstances) {
     matinstances = matinstances || {};
-    const registry = new Filament.MeshIO$MaterialRegistry();
+    const registry = new Filament.MeshReader$MaterialRegistry();
     for (var key in matinstances) {
         registry.set(key, matinstances[key]);
     }
     if (definstance) {
         registry.set("DefaultMaterial", definstance);
     }
-    const mesh = Filament.MeshIO.loadMeshFromBuffer(engine, buffer, registry);
+    const mesh = Filament.MeshReader.loadMeshFromBuffer(engine, buffer, registry);
     const keys = registry.keys();
     for (var i = 0; i < keys.size(); i++) {
         const key = keys.get(i);
@@ -237,64 +239,10 @@ Filament.loadMathExtensions = function() {
 
 Filament._createTextureFromKtx = function(ktxdata, engine, options) {
     options = options || {};
-
-    const Sampler = Filament.Texture$Sampler;
     const ktx = options['ktx'] || new Filament.KtxBundle(ktxdata);
-    const nlevels = ktx.getNumMipLevels();
-    const ktxformat = ktx.info().glInternalFormat;
     const rgbm = !!options['rgbm'];
     const srgb = !!options['srgb'];
-
-    // TODO: replace this switch with KtxBundle calls
-    const TextureFormat = Filament.Texture$InternalFormat;
-    const PixelDataFormat = Filament.PixelDataFormat;
-    const gl = Filament.ctx;
-    var texformat, pbformat, pbtype;
-    switch (ktxformat) {
-        case gl.LUMINANCE:
-            texformat = TextureFormat.R8;
-            pbformat = PixelDataFormat.R;
-            pbtype = Filament.PixelDataType.UBYTE;
-            break;
-        case gl.RGB:
-            texformat = srgb ? TextureFormat.SRGB8 : TextureFormat.RGB8;
-            pbformat = PixelDataFormat.RGB;
-            pbtype = Filament.PixelDataType.UBYTE;
-            break;
-        case gl.RGBA:
-            texformat = srgb ? TextureFormat.SRGB8_A8 : TextureFormat.RGBA8;
-            pbformat = rgbm ? PixelDataFormat.RGBM : PixelDataFormat.RGBA;
-            pbtype = Filament.PixelDataType.UBYTE;
-            break;
-        default:
-        console.error('Unsupported KTX format: ' + ktxformat);
-        return null;
-    }
-
-    const tex = Filament.Texture.Builder()
-        .width(ktx.info().pixelWidth)
-        .height(ktx.info().pixelHeight)
-        .levels(nlevels)
-        .sampler(ktx.isCubemap() ? Sampler.SAMPLER_CUBEMAP : Sampler.SAMPLER_2D)
-        .format(texformat)
-        .rgbm(rgbm)
-        .build(engine);
-
-    if (ktx.isCubemap()) {
-        for (var level = 0; level < nlevels; level++) {
-            const uint8array = ktx.getCubeBlob(level).getBytes();
-            const pixelbuffer = Filament.PixelBuffer(uint8array, pbformat, pbtype);
-            tex.setImageCube(engine, level, pixelbuffer);
-        }
-    } else {
-        for (var level = 0; level < nlevels; level++) {
-            const uint8array = ktx.getBlob([level, 0, 0]).getBytes();
-            const pixelbuffer = Filament.PixelBuffer(uint8array, pbformat, pbtype);
-            tex.setImage(engine, level, pixelbuffer);
-        }
-    }
-
-    return tex;
+    return Filament.KtxUtility$createTexture(engine, ktx, srgb, rgbm);
 };
 
 Filament._createIblFromKtx = function(ktxdata, engine, options) {
@@ -350,6 +298,44 @@ Filament._createTextureFromPng = function(pngdata, engine, options) {
     return tex;
 };
 
+Filament._createTextureFromJpeg = function(image, engine, options) {
+
+    options = options || {};
+    const srgb = !!options['srgb'];
+    const nomips = !!options['nomips'];
+
+    var context2d = document.createElement('canvas').getContext('2d');
+    context2d.canvas.width = image.width;
+    context2d.canvas.height = image.height;
+    context2d.width = image.width;
+    context2d.height = image.height;
+    context2d.globalCompositeOperation = 'copy';
+    context2d.drawImage(image, 0, 0);
+
+    var imgdata = context2d.getImageData(0, 0, image.width, image.height).data.buffer;
+    var decodedjpeg = new Uint8Array(imgdata);
+
+    const TF = Filament.Texture$InternalFormat;
+    const texformat = srgb ? TF.SRGB8_A8 : TF.RGBA8;
+    const pbformat = Filament.PixelDataFormat.RGBA;
+    const pbtype = Filament.PixelDataType.UBYTE;
+
+    const tex = Filament.Texture.Builder()
+        .width(image.width)
+        .height(image.height)
+        .levels(nomips ? 1 : 0xff)
+        .sampler(Filament.Texture$Sampler.SAMPLER_2D)
+        .format(texformat)
+        .build(engine);
+
+    const pixelbuffer = Filament.PixelBuffer(decodedjpeg, pbformat, pbtype);
+    tex.setImage(engine, 0, pixelbuffer);
+    if (!nomips) {
+        tex.generateMipmaps(engine);
+    }
+    return tex;
+};
+
 /// getSupportedFormats ::function:: Queries WebGL to check which compressed formats are supported.
 /// ::retval:: object with boolean values and the following keys: s3tc, astc, etc
 Filament.getSupportedFormats = function() {
@@ -388,9 +374,7 @@ Filament.getSupportedFormatSuffix = function(desiredFormats) {
     var exts = Filament.getSupportedFormats();
     for (var key in exts) {
         if (exts[key] && desiredFormats.includes(key)) {
-            // TODO: support compressed textures by returning the proper file suffix.
-            // return '_' + key;
-            return '';
+            return '_' + key;
         }
     }
     return '';

@@ -275,9 +275,11 @@ private:
     using GetProcAddressType = MustCastToRightType (*)(const char* name);
     GetProcAddressType getProcAddress = nullptr;
 
-    static bool hasExtension(std::set<utils::StaticString> const& exts, const char* ext) noexcept;
-    void initExtensionsGLES(GLint major, GLint minor, std::set<utils::StaticString> const& extensionsMap);
-    void initExtensionsGL(GLint major, GLint minor, std::set<utils::StaticString> const& extensionsMap);
+    // this is chosen to minimize code size
+    using ExtentionSet = std::set<utils::StaticString>;
+    static bool hasExtension(ExtentionSet const& exts, utils::StaticString ext) noexcept;
+    void initExtensionsGLES(GLint major, GLint minor, ExtentionSet const& extensionsMap);
+    void initExtensionsGL(GLint major, GLint minor, ExtentionSet const& extensionsMap);
 
 
     /* Misc... */
@@ -296,6 +298,7 @@ private:
             setRasterStateSlow(rs);
         }
     }
+
     void setTextureData(GLTexture* t,
             uint32_t level,
             uint32_t xoffset, uint32_t yoffset, uint32_t zoffset,
@@ -344,12 +347,14 @@ private:
     inline void disableVertexAttribArray(GLuint index) noexcept;
     inline void enable(GLenum cap) noexcept;
     inline void disable(GLenum cap) noexcept;
+    inline void frontFace(GLenum mode) noexcept;
     inline void cullFace(GLenum mode) noexcept;
     inline void blendEquation(GLenum modeRGB, GLenum modeA) noexcept;
     inline void blendFunction(GLenum srcRGB, GLenum srcA, GLenum dstRGB, GLenum dstA) noexcept;
     inline void colorMask(GLboolean flag) noexcept;
     inline void depthMask(GLboolean flag) noexcept;
     inline void depthFunc(GLenum func) noexcept;
+    inline void polygonOffset(GLfloat factor, GLfloat units) noexcept;
 
     inline void setScissor(GLint left, GLint bottom, GLsizei width, GLsizei height) noexcept;
     inline void setViewport(GLint left, GLint bottom, GLsizei width, GLsizei height) noexcept;
@@ -402,6 +407,7 @@ private:
         } vao;
 
         struct {
+            GLenum frontFace            = GL_CCW;
             GLenum cullFace             = GL_BACK;
             GLenum blendEquationRGB     = GL_FUNC_ADD;
             GLenum blendEquationA       = GL_FUNC_ADD;
@@ -413,6 +419,14 @@ private:
             GLboolean depthMask         = GL_TRUE;
             GLenum depthFunc            = GL_LESS;
         } raster;
+
+        struct PolygonOffset {
+            GLfloat factor = 0;
+            GLfloat units = 0;
+            bool operator != (PolygonOffset const& rhs) noexcept {
+                return factor != rhs.factor || units != rhs.units;
+            }
+        } polygonOffset;
 
         struct {
             utils::bitset32 caps;

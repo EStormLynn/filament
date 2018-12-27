@@ -203,15 +203,15 @@ public:
         return mBackend;
     }
 
-    duration getTime() const noexcept {
-        return clock::now() - getEpoch();
-    }
-
     void* streamAlloc(size_t size, size_t alignment) noexcept;
 
     utils::JobSystem& getJobSystem() noexcept { return mJobSystem; }
 
-    Epoch getEpoch() const { return mEpoch; }
+
+    Epoch getEngineEpoch() const { return mEngineEpoch; }
+    duration getEngineTime() const noexcept {
+        return clock::now() - getEngineEpoch();
+    }
 
     void shutdown();
 
@@ -259,11 +259,11 @@ public:
     void prepare();
     void gc();
 
-    filaflat::ShaderBuilder& getVertexShaderBuilder() noexcept {
+    filaflat::ShaderBuilder& getVertexShaderBuilder() const noexcept {
         return mVertexShaderBuilder;
     }
 
-    filaflat::ShaderBuilder& getFragmentShaderBuilder() noexcept {
+    filaflat::ShaderBuilder& getFragmentShaderBuilder() const noexcept {
         return mFragmentShaderBuilder;
     }
 
@@ -347,7 +347,7 @@ private:
 
     utils::JobSystem mJobSystem;
 
-    Epoch mEpoch;
+    Epoch mEngineEpoch;
 
     mutable FMaterial const* mDefaultMaterial = nullptr;
     mutable FMaterial const* mSkyboxMaterials[2] = { nullptr, nullptr };
@@ -360,8 +360,8 @@ private:
 
     mutable utils::CountDownLatch mDriverBarrier;
 
-    filaflat::ShaderBuilder mVertexShaderBuilder;
-    filaflat::ShaderBuilder mFragmentShaderBuilder;
+    mutable filaflat::ShaderBuilder mVertexShaderBuilder;
+    mutable filaflat::ShaderBuilder mFragmentShaderBuilder;
     FDebugRegistry mDebugRegistry;
 
 public:
@@ -378,16 +378,6 @@ public:
 };
 
 FILAMENT_UPCAST(Engine)
-
-class UTILS_PUBLIC EnginePerformanceTest {
-public:
-    //! \privatesection
-    using PFN = void(*)(void *);
-    virtual void activateBigBang() noexcept;
-    void activateOmegaThirteen() noexcept;
-    PFN getDestroyUniverseApi();
-    virtual ~EnginePerformanceTest() noexcept;
-};
 
 } // namespace details
 } // namespace filament

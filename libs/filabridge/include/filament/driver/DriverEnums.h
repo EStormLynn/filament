@@ -24,6 +24,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <utils/unwindows.h> // Because we define ERROR in the FenceStatus enum.
+
 namespace filament {
 
 /**
@@ -42,6 +44,7 @@ enum class Backend : uint8_t {
     DEFAULT = 0,  //!< Automatically selects an appropriate driver for the platform.
     OPENGL = 1,   //!< Selects the OpenGL driver (which supports OpenGL ES as well).
     VULKAN = 2,   //!< Selects the Vulkan driver if the platform supports it.
+    NOOP = 3,     //!< Selects the no-op driver for testing purposes.
 };
 
 /**
@@ -474,6 +477,14 @@ struct FaceOffsets {
     size_type  operator[](size_t n) const noexcept { return offsets[n]; }
     size_type& operator[](size_t n) { return offsets[n]; }
     FaceOffsets() noexcept = default;
+    FaceOffsets(size_type faceSize) noexcept {
+        px = faceSize * 0;
+        nx = faceSize * 1;
+        py = faceSize * 2;
+        ny = faceSize * 3;
+        pz = faceSize * 4;
+        nz = faceSize * 5;
+    }
     FaceOffsets(const FaceOffsets& rhs) noexcept {
         px = rhs.px;
         nx = rhs.nx;
